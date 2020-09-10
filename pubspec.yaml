@@ -58,6 +58,8 @@ flutter:
     - imagens/logo_empresa.png
     - imagens/fundoLogin.png
     - imagens/fundo_login.png
+    - imagens/carro_carregando.gif
+    - imagens/comprando_pneu.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Catalogo Gagliauto',
       theme: ThemeData(
-          primaryColor: Colors.lightBlue,
+          primaryColor: Color.fromRGBO(38, 36, 99, 1.0),
           accentColor: Color(0xff25D366)),
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,

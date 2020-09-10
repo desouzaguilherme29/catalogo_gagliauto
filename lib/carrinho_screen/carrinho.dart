@@ -8,6 +8,8 @@ class Carrinho extends StatefulWidget {
 class _CarrinhoState extends State<Carrinho> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(title: Text("Seus Produtos"),),
+    );
   }
 }

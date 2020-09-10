@@ -1,9 +1,8 @@
-import 'package:catalogo_gagliauto/carrinho.dart';
-import 'package:catalogo_gagliauto/destaques.dart';
-import 'package:catalogo_gagliauto/favoritos.dart';
-import 'package:catalogo_gagliauto/grupos_produtos.dart';
+import 'package:catalogo_gagliauto/carrinho_screen/carrinho.dart';
+import 'package:catalogo_gagliauto/favoritos_screen/favoritos.dart';
+import 'package:catalogo_gagliauto/grupos_produtos_screen/grupos_produtos.dart';
 import 'package:catalogo_gagliauto/homepage/widgets/stagger_animation.dart';
-import 'package:catalogo_gagliauto/teste.dart';
+import 'package:catalogo_gagliauto/destaques_screen/destaque_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,13 +14,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   AnimationController _controller;
   int currentTab = 0;
   final List<Widget> screens = [
-    Destaques(),
+    DestaquesScreen(),
     Grupos_Produtos(),
     Carrinho(),
     Favoritos(),
   ]; 
   final PageStorageBucket bucket = PageStorageBucket();
-  Widget currentScreen = Teste();
+  Widget currentScreen = DestaquesScreen();
 
   @override
   void initState() {
@@ -45,15 +44,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        StaggerAnimation(controller: _controller.view,),
+        //StaggerAnimation(controller: _controller.view,),
         Scaffold(
           body: PageStorage(
             child: currentScreen,
             bucket: bucket,
           ),
           floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.shopping_cart),
-            backgroundColor: Colors.blue,
+            child: Icon(Icons.shopping_cart, color: Colors.white,),
+            backgroundColor: Color.fromRGBO(38, 36, 99, 0.9),
             onPressed: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Carrinho()));
@@ -77,7 +76,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         onPressed: () {
                           setState(() {
                             currentScreen =
-                                Teste(); // if user taps on this dashboard tab will be active
+                                DestaquesScreen(); // if user taps on this dashboard tab will be active
                             currentTab = 0;
                           });
                         },
@@ -87,14 +86,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Icon(
                               Icons.home,
                               color:
-                                  currentTab == 0 ? Colors.blue : Colors.black,
+                                  currentTab == 0 ? Colors.blue : Color.fromRGBO(38, 36, 99, 1.0),
                             ),
                             Text(
                               'Início',
                               style: TextStyle(
                                 color: currentTab == 0
                                     ? Colors.blue
-                                    : Colors.black,
+                                    : Color.fromRGBO(38, 36, 99, 1.0),
                               ),
                             ),
                           ],
@@ -115,14 +114,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Icon(
                               Icons.format_list_bulleted,
                               color:
-                                  currentTab == 1 ? Colors.blue : Colors.black,
+                                  currentTab == 1 ? Colors.blue :Color.fromRGBO(38, 36, 99, 1.0),
                             ),
                             Text(
                               'Categorias',
                               style: TextStyle(
                                 color: currentTab == 1
                                     ? Colors.blue
-                                    : Colors.black,
+                                    : Color.fromRGBO(38, 36, 99, 1.0),
                               ),
                             ),
                           ],
@@ -148,14 +147,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Icon(
                               Icons.star,
                               color:
-                                  currentTab == 2 ? Colors.blue : Colors.black,
+                                  currentTab == 2 ? Colors.blue : Color.fromRGBO(38, 36, 99, 1.0),
                             ),
                             Text(
                               'Favoritos',
                               style: TextStyle(
                                 color: currentTab == 2
                                     ? Colors.blue
-                                    : Colors.black,
+                                    : Color.fromRGBO(38, 36, 99, 1.0),
                               ),
                             ),
                           ],
@@ -176,14 +175,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Icon(
                               Icons.more_horiz,
                               color:
-                                  currentTab == 3 ? Colors.blue : Colors.black,
+                                  currentTab == 3 ? Colors.blue : Color.fromRGBO(38, 36, 99, 1.0),
                             ),
                             Text(
                               'Mais',
                               style: TextStyle(
                                 color: currentTab == 3
                                     ? Colors.blue
-                                    : Colors.black,
+                                    : Color.fromRGBO(38, 36, 99, 1.0),
                               ),
                             ),
                           ],

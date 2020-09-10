@@ -1,4 +1,5 @@
-import 'package:catalogo_gagliauto/produtos_list.dart';
+import 'package:catalogo_gagliauto/list_produtos_screen/produtos_list.dart';
+import 'package:catalogo_gagliauto/url_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -12,19 +13,18 @@ class Grupos_Produtos extends StatefulWidget {
 
 class _Grupos_ProdutosState extends State<Grupos_Produtos> {
   TextEditingController _controllerPesquisa = new TextEditingController();
+  var list;
 
   @override
   Future _getGrupos() async {
     http.Response response;
 
-    if (_controllerPesquisa.text == null || _controllerPesquisa.text.isEmpty) {
-      response = await http.get(
-          "http://187.60.219.28:8830/MOBILE/MBSERVER.V/?FUNCAO=GETSCRIPT&VERSAO=20191030&ROTINA=GRUPOS&FILTRO=false");
-    } else {
-      response = await http.get(
-          "http://187.60.219.28:8830/MOBILE/MBSERVER.V/?FUNCAO=GETSCRIPT&VERSAO=20191030&ROTINA=GRUPOS&FILTRO=" +
-              _controllerPesquisa.text);
-    }
+    if (_controllerPesquisa.text == null || _controllerPesquisa.text.isEmpty)
+      response = await http.get(getUrlListaDeGrupos(filtro: ""));
+    else
+      response =
+          await http.get(getUrlListaDeGrupos(filtro: _controllerPesquisa.text));
+
     return json.decode(response.body);
   }
 
@@ -37,10 +37,10 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
       backgroundColor: Colors.white10,
       body: Column(
         children: <Widget>[
-          /*Padding(
+          Padding(
               padding: EdgeInsets.all(8),
               child: Container(
-                height: 45,
+                height: 55,
                 child: TextField(
                   style: TextStyle(fontSize: 15),
                   controller: _controllerPesquisa,
@@ -51,10 +51,13 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
                           borderRadius:
                               BorderRadius.all(Radius.circular(15.0)))),
                   onSubmitted: (pesquisa) {
-                    _getGrupos();
+                    setState(() {});
+                  },
+                  onChanged: (pesquisa) {
+                    if (pesquisa.isEmpty || pesquisa == "") setState(() {});
                   },
                 ),
-              )),*/
+              )),
           Expanded(
             child: FutureBuilder(
               future: _getGrupos(),
@@ -148,30 +151,33 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(2),
             ),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => Produtos_list(snapshot.data[index]["nome01_gru"].toString())));
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      snapshot.data[index]["nome01_gru"].toString(),
-                      style: TextStyle(fontSize: 14, fontFamily: "sans-serif"),
+            child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => Produtos_list(
+                              snapshot.data[index]["nome01_gru"].toString())));
+                },
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                  ),
-                )
-              ],
-            ));
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        snapshot.data[index]["nome01_gru"].toString(),
+                        style:
+                            TextStyle(fontSize: 14, fontFamily: "sans-serif"),
+                      ),
+                    ),
+                  ],
+                )));
       },
       hasSameHeader: (int a, int b) {
         return snapshot.data[a]["nome01_gru"].substring(0, 1) ==
