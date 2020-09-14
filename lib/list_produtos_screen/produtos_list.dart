@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:catalogo_gagliauto/carrinho_screen/carrinho.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/produto_detalhe.dart';
-import 'package:catalogo_gagliauto/url_service.dart';
+import 'package:catalogo_gagliauto/Model/url_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

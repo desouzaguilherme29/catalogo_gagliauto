@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:catalogo_gagliauto/detalhes_produtos_screen/produto_descricao_screen.dart';
-import 'package:catalogo_gagliauto/detalhes_produtos_screen/produto_info_tecnicas.dart';
-import 'package:catalogo_gagliauto/url_service.dart';
+import 'package:catalogo_gagliauto/detalhes_produtos_screen/screens/produto_descricao_screen.dart';
+import 'package:catalogo_gagliauto/detalhes_produtos_screen/screens/produto_info_tecnicas.dart';
+import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/ListViewEquivalencias.dart';
+import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/gesture_informacoes_tecnicas.dart';
+import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/gesturedescricaoproduto.dart';
+import 'package:catalogo_gagliauto/Model/url_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -29,12 +32,11 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
     return json.decode(response.body);
   }
 
-  Future _getProdutos() async {
+  Future _getProdutosEquivalentes() async {
     http.Response response;
 
-    response = await http.get(
-        "http://187.60.219.28:8830/MOBILE/MBSERVER.V/?FUNCAO=GETSCRIPT&VERSAO=20191030&ROTINA=PRODUTO&FILTRO=false");
-    print('passou');
+    response = await http.get(getUrlEquivalenciasProduto(codigo: widget.codigo_pro));
+
     return json.decode(response.body);
   }
 
@@ -294,238 +296,15 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
                     )),
               ),
             ),
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              DescricaoProduto(descricao: snapshot
-                                  .data[0]["descri_apl"].toString() == "null"
-                                  ? "Produto sem descrição... :("
-                                  : snapshot.data[0]["descri_apl"])));
-                },
-                child: Container(
-                  margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
-                  height: 65,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black12,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: Text(
-                              "Descrição do Produto",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: "sans-serif",
-                                  fontWeight: FontWeight.bold),
-                            )),
-                      ),
-                      Container(
-                        child: Icon(Icons.arrow_forward_ios),
-                      ),
-                    ],
-                  ),
-                )),
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              InformacoesTecnicas(snapshot: snapshot,)));
-                },
-                child: Container(
-                  margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
-                  height: 65,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black12,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: Text(
-                              "Informações Técnicas",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: "sans-serif",
-                                  fontWeight: FontWeight.bold),
-                            )),
-                      ),
-                      Container(
-                        child: Icon(Icons.arrow_forward_ios),
-                      ),
-                    ],
-                  ),
-                )),
-            FutureBuilder(
-              future: _getProdutos(),
-              // ignore: missing_return
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return Container(
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              height: 300,
-                              child: Image.asset("imagens/loading.GIF"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                    break;
-                  case ConnectionState.done:
-                    return Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            "produtos equivalentes a este",
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        Container(
-                            margin: EdgeInsets.all(5),
-                            height: 250,
-                            child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: snapshot.data.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  //projectSnap.data[index][""]
-                                  return Container(
-                                    margin: EdgeInsets.all(5),
-                                    width: 160.0,
-                                    child: Column(
-                                      children: <Widget>[
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ProdutoDetalhe(
-                                                            codigo_pro: snapshot
-                                                                .data[index]
-                                                            ["codigo_pro"]
-                                                                .toString())));
-                                          },
-                                          child: FadeInImage(
-                                              height: 140,
-                                              image: Image
-                                                  .memory(Base64Decoder()
-                                                  .convert(snapshot.data[index]
-                                              ["fotos"][0]["foto"]
-                                                  .toString()
-                                                  .replaceAll("\n", "")))
-                                                  .image,
-                                              placeholder: AssetImage(
-                                                  'imagens/carrega_produtos.GIF')),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Column(
-                                              children: <Widget>[
-                                                Text(
-                                                  snapshot
-                                                      .data[index]["descri_pro"]
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontWeight: FontWeight
-                                                          .w500,
-                                                      fontSize: 13),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Text(
-                                            "R\$ ${snapshot
-                                                .data[index]["pvenda_sld"]
-                                                .toString()}",
-                                            style: TextStyle(
-                                              color: Theme
-                                                  .of(context)
-                                                  .primaryColor,
-                                              fontSize: 17.0,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black26,
-                                            blurRadius: 2.0,
-                                            // has the effect of softening the shadow
-                                            spreadRadius: 2.0,
-                                            // has the effect of extending the shadow
-                                            offset: Offset(
-                                              2.0, // horizontal, move right 10
-                                              2.0, // vertical, move down 10
-                                            ),
-                                          )
-                                        ]),
-                                  );
-                                }))
-                      ],
-                    );
-                    break;
-                }
-              },
-            )
+            GestureDescricaoProduto(detalhes: snapshot
+                .data[0]["descri_apl"].toString().toString() == "null"
+                ? "Produto sem descrição... :("
+                : snapshot.data[0]["descri_apl"]),
+            GestureInformacoesTecnicas(snapshot: snapshot,),
+            ListviewEquivalencias(codigo_pro: widget.codigo_pro)
           ],
         );
       },
-    );
-  }
-
-  Widget _buildText(String campo, AsyncSnapshot snapshot) {
-    return Container(
-        decoration: BoxDecoration(
-            border:
-            Border(bottom: BorderSide(color: Colors.black12, width: 1))),
-        child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              snapshot.data[0][campo].toString(),
-              style: TextStyle(fontSize: 16.0),
-            )));
-  }
-
-  Widget _buildTextDescricao(String texto) {
-    return new Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        child: Text(
-          texto,
-          style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w500),
-          maxLines: 3,
-          textAlign: TextAlign.left,
-        ),
-      ),
     );
   }
 }

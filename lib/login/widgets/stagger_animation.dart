@@ -1,27 +1,30 @@
+import 'package:catalogo_gagliauto/Model/localsettings.dart';
+import 'package:catalogo_gagliauto/Model/url_service.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class StaggerAnimation extends StatelessWidget {
   final AnimationController controller;
+  final TextEditingController controllerUser;
+  final TextEditingController controllerPass;
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  StaggerAnimation({this.controller}) :
-        buttonSqueeze = Tween(
-            begin: 320.0,
-            end: 60.0
-        ).animate(
-            CurvedAnimation(
-                parent: controller,
-                curve: Interval(0.0, 0.150)
-            )
-        ),
+  StaggerAnimation(
+      {@required this.controller,
+      @required this.controllerUser,
+      @required this.controllerPass,
+      @required this.formKey})
+      : buttonSqueeze = Tween(begin: 320.0, end: 60.0).animate(
+            CurvedAnimation(parent: controller, curve: Interval(0.0, 0.150))),
         buttonZoomOut = Tween(
           begin: 60.0,
           end: 1000.0,
-        ).animate(
-            CurvedAnimation(
-              parent: controller,
-              curve: Interval(0.5, 1, curve: Curves.bounceOut),
-            )
-        );
+        ).animate(CurvedAnimation(
+          parent: controller,
+          curve: Interval(0.5, 1, curve: Curves.bounceOut),
+        ));
 
   final Animation<double> buttonSqueeze;
   final Animation<double> buttonZoomOut;
@@ -33,7 +36,9 @@ class StaggerAnimation extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 50),
       child: InkWell(
         onTap: () {
-          controller.forward();
+          if (formKey.currentState.validate()) {
+            _getDadosLogin(context);
+          }
         },
         child: Hero(
             tag: "fade",
@@ -44,6 +49,7 @@ class StaggerAnimation extends StatelessWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         color: Color.fromRGBO(38, 36, 99, 1.0),
+                        border: Border.all(color: Colors.white, width: 1.5),
                         borderRadius: BorderRadius.all(Radius.circular(30.0))),
                     child: _buildInside(context),
                   )
@@ -55,8 +61,7 @@ class StaggerAnimation extends StatelessWidget {
                         shape: buttonZoomOut.value < 500
                             ? BoxShape.circle
                             : BoxShape.rectangle),
-                  )
-        ),
+                  )),
       ),
     );
   }
@@ -84,6 +89,25 @@ class StaggerAnimation extends StatelessWidget {
         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         strokeWidth: 1.0,
       );
+    }
+  }
+
+  Future _getDadosLogin(BuildContext context) async {
+    LocalSettings settings = LocalSettings();
+    FocusScope.of(context).requestFocus(new FocusNode());
+
+    var response = await http.get(
+        getUrlLogin(usuario: controllerUser.text, senha: controllerPass.text));
+
+    if (response.statusCode == 200) {
+      var dados = json.decode(response.body);
+      if (dados[0]["logado"].toString() == "1") {
+        settings.preferences.setBool('isconected' ?? false, true);
+        controller.forward();
+      }
+    } else {
+      settings.preferences.setBool('isconected', false);
+      return false;
     }
   }
 }

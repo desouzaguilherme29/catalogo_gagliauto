@@ -11,6 +11,9 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
+  TextEditingController _controllerUser = TextEditingController();
+  TextEditingController _controllerPass = TextEditingController();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -39,29 +42,58 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         decoration: BoxDecoration(
             image: DecorationImage(
                 image: AssetImage("imagens/fundo_login.png"),
-                fit: BoxFit.cover)),
+                fit: BoxFit.cover),
+            color: Colors.grey),
         child: ListView(
-          padding: EdgeInsets.zero,
+          padding: EdgeInsets.all(0),
           children: <Widget>[
             Stack(
               alignment: Alignment.bottomCenter,
               children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(bottom: 80, left: 15, right: 15),
+                  height: 260,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 2.0,
+                          // has the effect of softening the shadow
+                          spreadRadius: 2.0,
+                          // has the effect of extending the shadow
+                          offset: Offset(
+                            2.0, // horizontal, move right 10
+                            2.0, // vertical, move down 10
+                          ),
+                        )
+                      ]),
+                ),
                 Column(
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.only(top: 40, bottom: 32),
+                      padding: EdgeInsets.only(top: 50, bottom: 32),
                       child: Image.asset(
                         "imagens/logo_empresa.png",
                         width: 600,
-                        height: 240,
+                        height: 250,
                         fit: BoxFit.contain,
                       ),
                     ),
-                    FormContainer(),
+                    FormContainer(
+                      controllerUser: _controllerUser,
+                      controllerPass: _controllerPass,
+                      formKey: _formKey,
+                    ),
                     SignUpButton()
                   ],
                 ),
-                StaggerAnimation(controller: _animationController.view)
+                StaggerAnimation(
+                    controller: _animationController.view,
+                    controllerUser: _controllerUser,
+                    controllerPass: _controllerPass,
+                    formKey: _formKey),
               ],
             )
           ],
