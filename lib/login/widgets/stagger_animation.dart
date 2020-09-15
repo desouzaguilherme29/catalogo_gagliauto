@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class StaggerAnimation extends StatelessWidget {
   final AnimationController controller;
   final TextEditingController controllerUser;
@@ -93,20 +95,25 @@ class StaggerAnimation extends StatelessWidget {
   }
 
   Future _getDadosLogin(BuildContext context) async {
-    LocalSettings settings = LocalSettings();
+    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final SharedPreferences prefs = await _prefs;
     FocusScope.of(context).requestFocus(new FocusNode());
-
     var response = await http.get(
         getUrlLogin(usuario: controllerUser.text, senha: controllerPass.text));
 
     if (response.statusCode == 200) {
       var dados = json.decode(response.body);
+      print(dados);
       if (dados[0]["logado"].toString() == "1") {
-        settings.preferences.setBool('isconected' ?? false, true);
+        prefs.setBool("isconected", true);
+        prefs.setString("name_user", dados[0]["nome01_cli"].toString());
+        prefs.setString("cpf_user", dados[0]["cpf001_cli"].toString());
         controller.forward();
       }
     } else {
-      settings.preferences.setBool('isconected', false);
+      prefs.setBool("isconected", false);
+      prefs.setString("name_user", "");
+      prefs.setString("cpf_user", "");
       return false;
     }
   }

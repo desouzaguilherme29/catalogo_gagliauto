@@ -1,7 +1,7 @@
 import 'package:catalogo_gagliauto/login/login.dart';
-import 'package:catalogo_gagliauto/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Model/localsettings.dart';
 import 'homepage/homepage.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
@@ -32,21 +32,21 @@ class MyApp extends StatelessWidget {
       home:
       AnimatedSplashScreen.withScreenFunction(
         splash: "imagens/logo_empresa.png",
-        duration: 3000,
+        splashIconSize: 240,
+        duration: 2000,
         // ignore: missing_return
         screenFunction: () async{
-          LocalSettings settings = LocalSettings();
-          await settings.getInstance();
-          print(settings.preferences.containsKey('isconected'));
+          Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+          final SharedPreferences prefs = await _prefs;
 
-          if (!settings.preferences.containsKey('isconected'))
-            return Login();
-          else
+          if (prefs.getBool("isconected")== true)
             return HomePage();
+          else
+            return Login();
         },
-          splashTransition: SplashTransition.slideTransition,
-          pageTransitionType: PageTransitionType.rightToLeftWithFade,
-          backgroundColor: Color.fromRGBO(38, 36, 99, 1.0)
+          splashTransition: SplashTransition.fadeTransition,
+          pageTransitionType: PageTransitionType.upToDown,
+          backgroundColor: Colors.white//Color.fromRGBO(38, 36, 99, 1.0)
       ),
     );
   }

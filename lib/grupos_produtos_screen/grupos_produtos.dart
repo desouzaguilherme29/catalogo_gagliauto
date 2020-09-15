@@ -1,5 +1,6 @@
 import 'package:catalogo_gagliauto/list_produtos_screen/produtos_list.dart';
 import 'package:catalogo_gagliauto/Model/url_service.dart';
+import 'package:catalogo_gagliauto/templates/template_error.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -83,7 +84,7 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
                     break;
                   default:
                     if (snapshot.hasError)
-                      return Container();
+                      return ErroCarregarDados();
                     else
                       return _carregaGrupos(context, snapshot);
                 }

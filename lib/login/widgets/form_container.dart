@@ -23,7 +23,7 @@ class FormContainer extends StatelessWidget {
               icon: Icons.person_outline,
               controller: controllerUser,
               validateText: "Insira o Usuário",
-              autoFocus: true,
+              autoFocus: false,
             ),
             InputField(
               hint: "Senha",

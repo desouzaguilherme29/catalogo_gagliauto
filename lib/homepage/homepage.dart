@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage>
           Icons.shopping_cart,
           color: Colors.white,
         ),
-        backgroundColor: Color.fromRGBO(38, 36, 99, 0.9),
+        backgroundColor: Color.fromRGBO(38, 36, 99,1.0),
         onPressed: () {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Carrinho()));
