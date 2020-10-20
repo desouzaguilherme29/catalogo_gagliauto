@@ -1,9 +1,13 @@
 import 'package:catalogo_gagliauto/destaques_screen/widgets/stagger_animation.dart';
 import 'package:flutter/material.dart';
-import 'Dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DestaquesScreen extends StatefulWidget {
+  String name_user;
+  String cpf_user;
+
+  DestaquesScreen({@required this.name_user, @required this.cpf_user});
+
   @override
   _DestaquesScreenState createState() => _DestaquesScreenState();
 }
@@ -37,7 +41,6 @@ class _DestaquesScreenState extends State<DestaquesScreen>
 
   @override
   Widget build(BuildContext context) {
-    print(name_user);
-    return StaggerAnimation(controller: _controller.view, name_user: "",);
+    return StaggerAnimation(controller: _controller.view, name_user: "oi",);
   }
 }

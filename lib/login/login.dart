@@ -60,9 +60,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                         BoxShadow(
                           color: Colors.black26,
                           blurRadius: 2.0,
-                          // has the effect of softening the shadow
                           spreadRadius: 2.0,
-                          // has the effect of extending the shadow
                           offset: Offset(
                             2.0, // horizontal, move right 10
                             2.0, // vertical, move down 10

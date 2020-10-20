@@ -1,10 +1,8 @@
-import 'package:catalogo_gagliauto/Model/localsettings.dart';
 import 'package:catalogo_gagliauto/Model/url_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StaggerAnimation extends StatelessWidget {
@@ -30,8 +28,6 @@ class StaggerAnimation extends StatelessWidget {
 
   final Animation<double> buttonSqueeze;
   final Animation<double> buttonZoomOut;
-
-  _getDataUser() {}
 
   Widget _builderAnimation(BuildContext context, Widget child) {
     return Padding(
@@ -98,6 +94,7 @@ class StaggerAnimation extends StatelessWidget {
     Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
     final SharedPreferences prefs = await _prefs;
     FocusScope.of(context).requestFocus(new FocusNode());
+
     var response = await http.get(
         getUrlLogin(usuario: controllerUser.text, senha: controllerPass.text));
 
@@ -107,12 +104,14 @@ class StaggerAnimation extends StatelessWidget {
       if (dados[0]["logado"].toString() == "1") {
         prefs.setBool("isconected", true);
         prefs.setString("name_user", dados[0]["nome01_cli"].toString());
+        prefs.setString("code_user", dados[0]["codigo_cli"].toString());
         prefs.setString("cpf_user", dados[0]["cpf001_cli"].toString());
         controller.forward();
       }
     } else {
       prefs.setBool("isconected", false);
       prefs.setString("name_user", "");
+      prefs.setString("code_user", "");
       prefs.setString("cpf_user", "");
       return false;
     }

@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:catalogo_gagliauto/detalhes_produtos_screen/screens/produto_descricao_screen.dart';
-import 'package:catalogo_gagliauto/detalhes_produtos_screen/screens/produto_info_tecnicas.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/ListViewEquivalencias.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/gesture_informacoes_tecnicas.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/gesturedescricaoproduto.dart';
@@ -10,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProdutoDetalhe extends StatefulWidget {
   String codigo_pro;
@@ -54,7 +53,18 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
     _controllerQuantidade.text = quantidade.toString();
   }
 
-  _addCarrinho() {}
+  _addCarrinho(String produto, num quantidade) async {
+    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final SharedPreferences prefs = await _prefs;
+    http.Response response;
+
+    response = await http.get(getUrlAddProdutoCarrinho(
+        cliente: prefs.getString("code_user"),
+        produto: produto,
+        quantidade: quantidade));
+
+    return json.decode(response.body);
+  }
 
   @override
   void initState() {
@@ -261,7 +271,11 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
             Padding(
               padding: EdgeInsets.only(bottom: 50),
               child: InkWell(
-                onTap: _addCarrinho,
+                onTap: (){
+                  _addCarrinho(
+                      snapshot.data[0]["codigo_pro"].toString(),
+                      num.parse(_controllerQuantidade.text));
+                },
                 child: Hero(
                     tag: "fade",
                     child: Container(
