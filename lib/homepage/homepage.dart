@@ -5,29 +5,45 @@ import 'package:catalogo_gagliauto/homepage/widgets/stagger_animation.dart';
 import 'package:catalogo_gagliauto/destaques_screen/destaque_screen.dart';
 import 'package:catalogo_gagliauto/right_menu/right_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart';
 
 class HomePage extends StatefulWidget {
+  String nomeuser;
+  String cpfuser;
+
+  HomePage({@required this.nomeuser, @required this.cpfuser});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
+
+String nomeusuario = "";
+String cpfusuario = "";
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   int currentTab = 0;
   final List<Widget> screens = [
-    DestaquesScreen(),
+    DestaquesScreen(
+      name_user: nomeusuario,
+      cpf_user: cpfusuario,
+    ),
     Grupos_Produtos(),
     Carrinho(),
     Favoritos(),
   ];
   final PageStorageBucket bucket = PageStorageBucket();
-  Widget currentScreen = DestaquesScreen();
+  Widget currentScreen =
+      DestaquesScreen(name_user: nomeusuario, cpf_user: cpfusuario);
 
   @override
   void initState() {
     super.initState();
 
+    nomeusuario = widget.nomeuser;
+    cpfusuario = widget.cpfuser;
+    print('homepage   ' + nomeusuario);
     _controller = AnimationController(
         vsync: this, duration: Duration(milliseconds: 2000));
 
@@ -55,7 +71,7 @@ class _HomePageState extends State<HomePage>
           Icons.shopping_cart,
           color: Colors.white,
         ),
-        backgroundColor: Color.fromRGBO(38, 36, 99,1.0),
+        backgroundColor: Color.fromRGBO(38, 36, 99, 1.0),
         onPressed: () {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Carrinho()));
@@ -78,7 +94,7 @@ class _HomePageState extends State<HomePage>
                     onPressed: () {
                       setState(() {
                         currentScreen =
-                            DestaquesScreen(); // if user taps on this dashboard tab will be active
+                            DestaquesScreen(name_user: nomeusuario, cpf_user: cpfusuario); // if user taps on this dashboard tab will be active
                         currentTab = 0;
                       });
                     },
@@ -149,7 +165,7 @@ class _HomePageState extends State<HomePage>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Icon(
-                          Icons.star,
+                          Icons.favorite_border,
                           color: currentTab == 2
                               ? Colors.blue
                               : Color.fromRGBO(38, 36, 99, 1.0),

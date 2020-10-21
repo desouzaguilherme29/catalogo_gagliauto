@@ -3,13 +3,15 @@ import 'dart:convert';
 import 'package:catalogo_gagliauto/carrinho_screen/carrinho.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/produto_detalhe.dart';
 import 'package:catalogo_gagliauto/Model/url_service.dart';
+import 'package:catalogo_gagliauto/templates/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Produtos_list extends StatefulWidget {
   String codigo_gru;
+  String nome01_gru;
 
-  Produtos_list(this.codigo_gru);
+  Produtos_list({@required this.codigo_gru,@required this.nome01_gru});
 
   @override
   _Produtos_listState createState() => _Produtos_listState();
@@ -17,15 +19,16 @@ class Produtos_list extends StatefulWidget {
 
 class _Produtos_listState extends State<Produtos_list> {
   @override
+  TextEditingController _controllerPesquisa = new TextEditingController();
   String _search;
 
   Future _getProdutos() async {
     http.Response response;
 
-    if (_search == null || _search.isEmpty)
-      response = await http.get(getUrlListaDeProdutos(filtro: "false"));
+    if (_controllerPesquisa.text == null || _controllerPesquisa.text.isEmpty)
+      response = await http.get(getUrlListaDeProdutosGrupo(grupo: widget.codigo_gru, filtro: ""));
     else
-      response = await http.get(getUrlListaDeProdutos(filtro: "false"));
+      response = await http.get(getUrlListaDeProdutosGrupo(grupo: widget.codigo_gru, filtro:  _controllerPesquisa.text));
 
     return json.decode(response.body);
   }
@@ -44,7 +47,7 @@ class _Produtos_listState extends State<Produtos_list> {
             },
           ),
           appBar: AppBar(
-            title: Text(widget.codigo_gru),
+            title: Text(widget.nome01_gru),
             centerTitle: true,
             bottom: TabBar(
               indicatorColor: Colors.white,
@@ -58,36 +61,51 @@ class _Produtos_listState extends State<Produtos_list> {
               ],
             ),
           ),
-          body: FutureBuilder(
-            future: _getProdutos(),
-            // ignore: missing_return
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                  return Container(
-                    child: Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            height: 168,
-                            child: Image.asset("imagens/loading.GIF"),
-                          ),
-                          //Text("")
-                        ],
-                      ),
+          body:
+          Column(
+            children: [
+              Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Container(
+                    height: 55,
+                    child: TextField(
+                      style: TextStyle(fontSize: 15),
+                      controller: _controllerPesquisa,
+                      decoration: InputDecoration(
+                          hintText: "Pesquisar...",
+                          suffixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(15.0)))),
+                      onSubmitted: (pesquisa) {
+                        setState(() {});
+                      },
+                      onChanged: (pesquisa) {
+                        if (pesquisa.isEmpty || pesquisa == "") setState(() {});
+                      },
                     ),
-                  );
-                  break;
-                default:
-                  if (snapshot.hasError)
-                    return Container();
-                  else
-                    return _createGradeTable(context, snapshot);
-              }
-            },
-          ),
+                  )),
+              Expanded(
+                child: FutureBuilder(
+                  future: _getProdutos(),
+                  // ignore: missing_return
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Loading();
+                        break;
+                      default:
+                        if (snapshot.hasError)
+                          return Container();
+                        else
+                          return _createGradeTable(context, snapshot);
+                    }
+                  },
+                ),
+              )
+            ],
+          )
+
         ));
   }
 
@@ -108,7 +126,9 @@ class _Produtos_listState extends State<Produtos_list> {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => ProdutoDetalhe(
                           codigo_pro:
-                              snapshot.data[index]["codigo_pro"].toString())));
+                              snapshot.data[index]["codigo_pro"].toString(),
+                        tp_favorito: true,
+                     )));
                 },
                 child: Card(
                     child: Column(
@@ -118,13 +138,18 @@ class _Produtos_listState extends State<Produtos_list> {
                     AspectRatio(
                       aspectRatio: 1.0,
                       child: FadeInImage(
-                          image: Image.memory(Base64Decoder().convert(snapshot
-                                  .data[index]["fotos"][0]["foto"]
-                                  .toString()
-                                  .replaceAll("\n", "")))
+                          height: 120,
+                          width: 160,
+                          image: snapshot.data[index]["fotos"].toString() == "0" ? AssetImage('imagens/sem_imagem.jpg') : Image.memory(Base64Decoder()
+                              .convert(snapshot
+                              .data[index]["fotos"][0]
+                          ["foto"]
+                              .toString()
+                              .replaceAll("\n", "")
+                              .replaceAll("\r", "")
+                          ))
                               .image,
-                          placeholder:
-                              AssetImage('imagens/carrega_produtos.GIF')),
+                          placeholder: AssetImage('imagens/carrega_produtos.GIF')),
                     ),
                     Expanded(
                       child: Container(
@@ -136,7 +161,7 @@ class _Produtos_listState extends State<Produtos_list> {
                               style: TextStyle(fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              "R\$ ${snapshot.data[index]["pvenda_sld"].toString()}",
+                              "R\$ ${snapshot.data[index]["pvenda_sld"].toStringAsFixed(2)}",
                               style: TextStyle(
                                   color: Theme.of(context).primaryColor,
                                   fontSize: 17.0,
@@ -153,41 +178,45 @@ class _Produtos_listState extends State<Produtos_list> {
           padding: EdgeInsets.all(4.0),
           itemCount: snapshot.data.length,
           itemBuilder: (context, index) {
-            return Row(
-              children: <Widget>[
-                Flexible(
-                  flex: 1,
-                  child: FadeInImage(
-                      image: Image.memory(Base64Decoder().convert(snapshot
-                              .data[index]["fotos"][0]["foto"]
-                              .toString()
-                              .replaceAll("\n", "")))
-                          .image,
-                      placeholder: AssetImage('imagens/carrega_produtos.GIF')),
-                ),
-                Flexible(
-                  flex: 1,
-                  child: Container(
-                    padding: EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          snapshot.data[index]["descri_pro"].toString(),
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        Text(
-                          "R\$ ${snapshot.data[index]["pvenda_sld"].toString()}",
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
+            return Container(
+              height: 100,
+              child: Row(
+                children: <Widget>[
+                  Flexible(
+                    flex: 1,
+                    child: FadeInImage(
+                      width: 150,
+                        image: Image.memory(Base64Decoder().convert(snapshot
+                            .data[index]["fotos"][0]["foto"]
+                            .toString()
+                            .replaceAll("\n", "")))
+                            .image,
+                        placeholder: AssetImage('imagens/carrega_produtos.GIF')),
                   ),
-                )
-              ],
+                  Flexible(
+                    flex: 1,
+                    child: Container(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            snapshot.data[index]["descri_pro"].toString(),
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            "R\$ ${snapshot.data[index]["pvenda_sld"].toStringAsFixed(2)}",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 17.0,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             );
           })
     ]);

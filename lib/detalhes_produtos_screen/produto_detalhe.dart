@@ -12,8 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ProdutoDetalhe extends StatefulWidget {
   String codigo_pro;
+  bool tp_favorito;
 
-  ProdutoDetalhe({@required this.codigo_pro});
+  ProdutoDetalhe({@required this.codigo_pro, @required this.tp_favorito});
 
   @override
   _ProdutoDetalheState createState() => _ProdutoDetalheState();
@@ -66,6 +67,18 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
     return json.decode(response.body);
   }
 
+  _addFavorito() async {
+    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final SharedPreferences prefs = await _prefs;
+    http.Response response;
+
+    response = await http.get(getUrlAddProdutoFavorito(
+        cliente: prefs.getString("code_user"),
+        produto: widget.codigo_pro));
+
+        return json.decode(response.body);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -79,13 +92,23 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
           title: Text("Produto"),
           centerTitle: true,
           actions: <Widget>[
+            widget.tp_favorito ?
+            IconButton(
+              icon: const Icon(
+                Icons.favorite,
+                size: 30,
+              ),
+              color: Colors.red,
+              tooltip: 'Adicionar aos Favoritos',
+              onPressed: _addFavorito,
+            ) :
             IconButton(
               icon: const Icon(
                 Icons.favorite_border,
                 size: 30,
               ),
               tooltip: 'Adicionar aos Favoritos',
-              onPressed: () {},
+              onPressed: _addFavorito,
             ),
             IconButton(
               icon: const Icon(
@@ -147,7 +170,7 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
                       image: Image
                           .memory(Base64Decoder().convert(url
                           .toString()
-                          .replaceAll("\n", "")
+                          .replaceAll("\n", "").replaceAll("\r", "")
                           .replaceAll("{foto: ", "")
                           .replaceAll("}", "")))
                           .image,

@@ -1,5 +1,6 @@
 import 'package:catalogo_gagliauto/list_produtos_screen/produtos_list.dart';
 import 'package:catalogo_gagliauto/Model/url_service.dart';
+import 'package:catalogo_gagliauto/templates/loading.dart';
 import 'package:catalogo_gagliauto/templates/template_error.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -66,21 +67,7 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
-                    return Container(
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              height: 168,
-                              child: Image.asset("imagens/loading.GIF"),
-                            ),
-                            //Text("")
-                          ],
-                        ),
-                      ),
-                    );
+                    return Loading();
                     break;
                   default:
                     if (snapshot.hasError)
@@ -158,7 +145,11 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
                       context,
                       MaterialPageRoute(
                           builder: (_) => Produtos_list(
-                              snapshot.data[index]["nome01_gru"].toString())));
+                                codigo_gru: snapshot.data[index]["codigo_gru"]
+                                    .toString(),
+                                nome01_gru: snapshot.data[index]["nome01_gru"]
+                                    .toString(),
+                              )));
                 },
                 child: Row(
                   children: <Widget>[

@@ -1,5 +1,7 @@
 import 'package:catalogo_gagliauto/Model/url_service.dart';
 import 'package:catalogo_gagliauto/carrinho_screen/widgets/stagger_animation.dart';
+import 'package:catalogo_gagliauto/templates/loading.dart';
+import 'package:catalogo_gagliauto/templates/template_error.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -72,25 +74,11 @@ class _CarrinhoState extends State<Carrinho>
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      return Container(
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                height: 168,
-                                child: Image.asset("imagens/loading.GIF"),
-                              ),
-                              //Text("")
-                            ],
-                          ),
-                        ),
-                      );
+                      return Loading();
                       break;
                     default:
                       if (snapshot.hasError)
-                        return Container();
+                        return ErroCarregarDados();
                       else
                         return _createGradeTable(context, snapshot);
                   }
@@ -121,25 +109,11 @@ class _CarrinhoState extends State<Carrinho>
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
-                        return Container(
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  height: 168,
-                                  child: Image.asset("imagens/loading.GIF"),
-                                ),
-                                //Text("")
-                              ],
-                            ),
-                          ),
-                        );
+                        return Loading();
                         break;
                       default:
                         if (snapshot.hasError)
-                          return Container();
+                          return ErroCarregarDados();
                         else
                           return Column(
                             children: [
@@ -212,16 +186,18 @@ class _CarrinhoState extends State<Carrinho>
                       children: [
                         ListTile(
                           leading: FadeInImage(
-                              width: 75,
-                              image: Image
-                                  .memory(Base64Decoder().convert(snapshot
-                                  .data[index]["fotos"][0]["foto"]
+                              height: 120,
+                              width: 160,
+                              image: snapshot.data[index]["fotos"].toString() == "0" ? AssetImage('imagens/sem_imagem.jpg') : Image.memory(Base64Decoder()
+                                  .convert(snapshot
+                                  .data[index]["fotos"][0]
+                              ["foto"]
                                   .toString()
-                                  .replaceAll("\n", "")))
+                                  .replaceAll("\n", "")
+                                  .replaceAll("\r", "")
+                              ))
                                   .image,
-                              placeholder:
-                              AssetImage('imagens/carrega_produtos.GIF')
-                          ),
+                              placeholder: AssetImage('imagens/carrega_produtos.GIF')),
                           title: Text(
                             snapshot.data[index]["descri_pro"],
                             style: TextStyle(fontSize: 16),

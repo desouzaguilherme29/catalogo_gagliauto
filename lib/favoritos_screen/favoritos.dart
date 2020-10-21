@@ -1,4 +1,5 @@
 import 'package:catalogo_gagliauto/Model/url_service.dart';
+import 'package:catalogo_gagliauto/templates/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -39,21 +40,7 @@ class _FavoritosState extends State<Favoritos> {
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      return Container(
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                height: 168,
-                                child: Image.asset("imagens/loading.GIF"),
-                              ),
-                              //Text("")
-                            ],
-                          ),
-                        ),
-                      );
+                      return Loading();
                       break;
                     default:
                       if (snapshot.hasError)
@@ -72,7 +59,6 @@ class _FavoritosState extends State<Favoritos> {
     return ListView.builder(
         itemCount: snapshot.data.length,
         itemBuilder: (BuildContext context, int index) {
-          //_editingController.value = _editingController.value + double.parse(snapshot.data[index]["pvenda_sld"].toString());
           return Slidable(
             actionPane: SlidableDrawerActionPane(),
             actionExtentRatio: 0.25,

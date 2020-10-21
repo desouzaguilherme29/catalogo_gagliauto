@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           final SharedPreferences prefs = await _prefs;
 
           if (prefs.getBool("isconected")== true)
-            return HomePage();
+            return HomePage(nomeuser: prefs.getString("name_user"),cpfuser: prefs.getString("cpf_user"),);
           else
             return Login();
         },

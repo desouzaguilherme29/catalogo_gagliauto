@@ -39,6 +39,7 @@ dependencies:
   shared_preferences: ^0.5.10
   animated_splash_screen: ^1.0.1
   flutter_slidable: ^0.5.4
+  badges: ^1.1.3
 
 dev_dependencies:
   flutter_test:
@@ -63,10 +64,12 @@ flutter:
     - imagens/loading.GIF
     - imagens/promocao.jpg
     - imagens/logo_empresa.png
+    - imagens/logo_empresa.jpg
     - imagens/fundoLogin.png
     - imagens/fundo_login.png
     - imagens/carro_carregando.gif
     - imagens/comprando_pneu.gif
+    - imagens/sem_imagem.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
