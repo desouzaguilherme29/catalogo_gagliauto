@@ -8,17 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:badges/badges.dart';
 
 class HomePage extends StatefulWidget {
-  String nomeuser;
-  String cpfuser;
-
-  HomePage({@required this.nomeuser, @required this.cpfuser});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
-
-String nomeusuario = "";
-String cpfusuario = "";
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
@@ -26,8 +19,6 @@ class _HomePageState extends State<HomePage>
   int currentTab = 0;
   final List<Widget> screens = [
     DestaquesScreen(
-      name_user: nomeusuario,
-      cpf_user: cpfusuario,
     ),
     Grupos_Produtos(),
     Carrinho(),
@@ -35,15 +26,12 @@ class _HomePageState extends State<HomePage>
   ];
   final PageStorageBucket bucket = PageStorageBucket();
   Widget currentScreen =
-      DestaquesScreen(name_user: nomeusuario, cpf_user: cpfusuario);
+      DestaquesScreen();
 
   @override
   void initState() {
     super.initState();
 
-    nomeusuario = widget.nomeuser;
-    cpfusuario = widget.cpfuser;
-    print('homepage   ' + nomeusuario);
     _controller = AnimationController(
         vsync: this, duration: Duration(milliseconds: 2000));
 
@@ -90,11 +78,11 @@ class _HomePageState extends State<HomePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   MaterialButton(
-                    minWidth: 40,
+                    minWidth: MediaQuery.of(context).size.width*0.20,
                     onPressed: () {
                       setState(() {
                         currentScreen =
-                            DestaquesScreen(name_user: nomeusuario, cpf_user: cpfusuario); // if user taps on this dashboard tab will be active
+                            DestaquesScreen(); // if user taps on this dashboard tab will be active
                         currentTab = 0;
                       });
                     },
@@ -119,7 +107,7 @@ class _HomePageState extends State<HomePage>
                     ),
                   ),
                   MaterialButton(
-                    minWidth: 40,
+                    minWidth: MediaQuery.of(context).size.width*0.20,
                     onPressed: () {
                       setState(() {
                         currentScreen =
@@ -153,7 +141,7 @@ class _HomePageState extends State<HomePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   MaterialButton(
-                    minWidth: 40,
+                    minWidth: MediaQuery.of(context).size.width*0.20,
                     onPressed: () {
                       setState(() {
                         currentScreen =
@@ -182,7 +170,7 @@ class _HomePageState extends State<HomePage>
                     ),
                   ),
                   MaterialButton(
-                    minWidth: 40,
+                    minWidth: MediaQuery.of(context).size.width*0.20,
                     onPressed: () {
                       _scaffoldKey.currentState.openEndDrawer();
                     },

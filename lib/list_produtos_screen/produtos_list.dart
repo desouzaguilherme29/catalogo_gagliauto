@@ -20,6 +20,7 @@ class Produtos_list extends StatefulWidget {
 class _Produtos_listState extends State<Produtos_list> {
   @override
   TextEditingController _controllerPesquisa = new TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
   String _search;
 
   Future _getProdutos() async {
@@ -37,6 +38,7 @@ class _Produtos_listState extends State<Produtos_list> {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
+            key: _scaffoldkey,
           backgroundColor: Colors.white,
           floatingActionButton: FloatingActionButton(
             child: Icon(Icons.shopping_cart,color: Colors.white,),
@@ -185,11 +187,16 @@ class _Produtos_listState extends State<Produtos_list> {
                   Flexible(
                     flex: 1,
                     child: FadeInImage(
-                      width: 150,
-                        image: Image.memory(Base64Decoder().convert(snapshot
-                            .data[index]["fotos"][0]["foto"]
+                        height: 120,
+                        width: 160,
+                        image: snapshot.data[index]["fotos"].toString() == "0" ? AssetImage('imagens/sem_imagem.jpg') : Image.memory(Base64Decoder()
+                            .convert(snapshot
+                            .data[index]["fotos"][0]
+                        ["foto"]
                             .toString()
-                            .replaceAll("\n", "")))
+                            .replaceAll("\n", "")
+                            .replaceAll("\r", "")
+                        ))
                             .image,
                         placeholder: AssetImage('imagens/carrega_produtos.GIF')),
                   ),

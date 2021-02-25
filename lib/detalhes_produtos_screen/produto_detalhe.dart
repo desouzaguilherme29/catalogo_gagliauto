@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:catalogo_gagliauto/Model/imagemPadraoBase64.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/ListViewEquivalencias.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/gesture_informacoes_tecnicas.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/gesturedescricaoproduto.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProdutoDetalhe extends StatefulWidget {
@@ -164,8 +166,11 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
           children: <Widget>[
             AspectRatio(
               aspectRatio: 1,
-              child: Carousel(
-                images: snapshot.data[0]["fotos"].map((url) {
+              child:
+              snapshot.data[0]["fotos"].toString() != "0" ?
+              Carousel(
+                images:
+                snapshot.data[0]["fotos"].map((url) {
                   return FadeInImage(
                       image: Image
                           .memory(Base64Decoder().convert(url
@@ -182,7 +187,20 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
                 dotColor: Colors.white,
                 autoplay: false,
                 borderRadius: true,
-              ),
+              ) :
+              Carousel(
+                images: [
+                  FadeInImage(
+                      image: AssetImage('imagens/sem_imagem.jpg'),
+                      placeholder: AssetImage('imagens/carrega_produtos.GIF'))
+                ],
+                dotSize: 4.0,
+                dotSpacing: 15.0,
+                dotBgColor: Colors.white,
+                dotColor: Colors.white,
+                autoplay: false,
+                borderRadius: true,
+              )
             ),
             Text(
               snapshot.data[0]["descri_pro"],
@@ -315,20 +333,20 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
                                 child: Icon(Icons.shopping_cart, size: 35,
                                   color: Colors.white,)
                             ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "        Adicionar ao carrinho",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 19,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: 0.3),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Adicionar ao carrinho",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 21,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.3),
+                                ),
                               ),
-                            )
-
-
-                          ],
+                            ),
+],
                         ) //_buildInside(context),
                     )),
               ),

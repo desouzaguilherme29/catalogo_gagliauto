@@ -139,14 +139,14 @@ class _CarrinhoState extends State<Carrinho>
                                     Align(
                                       alignment: Alignment.bottomRight,
                                       child: Container(
-                                        margin: EdgeInsets.all(25),
+                                        margin: EdgeInsets.all(15),
                                         padding:
                                         const EdgeInsets.symmetric(
                                             horizontal: 10.0),
                                         child: Text(
                                           "R\$ ${snapshot.data[0]["total"]
                                               .toString()}",
-                                          style: TextStyle(fontSize: 30),
+                                          style: TextStyle(fontSize: 28),
                                         ),
                                       ),
                                     ),

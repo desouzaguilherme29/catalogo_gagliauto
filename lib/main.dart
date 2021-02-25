@@ -1,4 +1,5 @@
 import 'package:catalogo_gagliauto/login/login.dart';
+import 'package:catalogo_gagliauto/login2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
           final SharedPreferences prefs = await _prefs;
 
           if (prefs.getBool("isconected")== true)
-            return HomePage(nomeuser: prefs.getString("name_user"),cpfuser: prefs.getString("cpf_user"),);
+            return HomePage();
           else
             return Login();
         },
