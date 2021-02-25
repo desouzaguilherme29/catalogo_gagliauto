@@ -71,12 +71,13 @@ class _FavoritosState extends State<Favoritos> {
                         ListTile(
                           leading: FadeInImage(
                               width: 75,
-                              image: Image
-                                  .memory(Base64Decoder().convert(snapshot
-                                  .data[index]["fotos"][0]["foto"]
-                                  .toString()
-                                  .replaceAll("\n", "")))
+                              image:
+                              Image.memory(base64Decode(
+                                  snapshot
+                                      .data[index]["fotos"][0]["foto"]
+                                      .toString().replaceAll("\n", "").replaceAll("\r", "")))
                                   .image,
+
                               placeholder:
                               AssetImage('imagens/carrega_produtos.GIF')
                           ),
