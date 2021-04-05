@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage>
                               : Color.fromRGBO(38, 36, 99, 1.0),
                         ),
                         Text(
-                          'Categorias',
+                          'Marcas',
                           style: TextStyle(
                             color: currentTab == 1
                                 ? Colors.blue

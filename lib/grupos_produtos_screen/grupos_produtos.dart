@@ -33,7 +33,7 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Grupos de Produtos"),
+        title: Text("Marcas de Produtos"),
         centerTitle: true,
       ),
       backgroundColor: Colors.white10,
@@ -44,21 +44,18 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
               child: Container(
                 height: 55,
                 child: TextField(
-                  style: TextStyle(fontSize: 15),
-                  controller: _controllerPesquisa,
-                  decoration: InputDecoration(
-                      hintText: "Pesquisar...",
-                      suffixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(15.0)))),
-                  onSubmitted: (pesquisa) {
-                    setState(() {});
-                  },
-                  onChanged: (pesquisa) {
-                    if (pesquisa.isEmpty || pesquisa == "") setState(() {});
-                  },
-                ),
+                    style: TextStyle(fontSize: 15),
+                    controller: _controllerPesquisa,
+                    decoration: InputDecoration(
+                        hintText: "Pesquisar...",
+                        suffixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(15.0)))),
+                    onSubmitted: (pesquisa) {
+                      if (pesquisa.isEmpty || pesquisa == "")
+                        setState(() {});
+                    }),
               )),
           Expanded(
             child: FutureBuilder(
@@ -107,7 +104,7 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
                 Padding(
                   padding: EdgeInsets.all(10),
                   child: Text(
-                    snapshot.data[index]["nome01_gru"].toString(),
+                    snapshot.data[index]["DESCRI_MAR"].toString(),
                     style: TextStyle(fontSize: 14, fontFamily: "sans-serif"),
                   ),
                 )
@@ -125,7 +122,7 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
       headerBuilder: (BuildContext context, int index) {
         return new SizedBox(
             width: 32.0,
-            child: new Text(snapshot.data[index]["nome01_gru"].substring(0, 1),
+            child: new Text(snapshot.data[index]["DESCRI_MAR"].substring(0, 1),
                 style: TextStyle(
                     color: Colors.blue,
                     fontSize: 20,
@@ -145,9 +142,9 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
                       context,
                       MaterialPageRoute(
                           builder: (_) => Produtos_list(
-                                codigo_gru: snapshot.data[index]["codigo_gru"]
+                                codigo_mar: snapshot.data[index]["CODIGO_MAR"]
                                     .toString(),
-                                nome01_gru: snapshot.data[index]["nome01_gru"]
+                                nome01_gru: snapshot.data[index]["DESCRI_MAR"]
                                     .toString(),
                               )));
                 },
@@ -163,7 +160,7 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
                     Padding(
                       padding: EdgeInsets.all(10),
                       child: Text(
-                        snapshot.data[index]["nome01_gru"].toString(),
+                        snapshot.data[index]["DESCRI_MAR"].toString(),
                         style:
                             TextStyle(fontSize: 14, fontFamily: "sans-serif"),
                       ),
@@ -172,8 +169,8 @@ class _Grupos_ProdutosState extends State<Grupos_Produtos> {
                 )));
       },
       hasSameHeader: (int a, int b) {
-        return snapshot.data[a]["nome01_gru"].substring(0, 1) ==
-            snapshot.data[b]["nome01_gru"].substring(0, 1);
+        return snapshot.data[a]["DESCRI_MAR"].substring(0, 1) ==
+            snapshot.data[b]["DESCRI_MAR"].substring(0, 1);
       },
     );
   }

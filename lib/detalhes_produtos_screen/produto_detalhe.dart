@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:catalogo_gagliauto/Model/imagemPadraoBase64.dart';
+import 'package:catalogo_gagliauto/carrinho_screen/carrinho.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/ListViewEquivalencias.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/gesture_informacoes_tecnicas.dart';
 import 'package:catalogo_gagliauto/detalhes_produtos_screen/widgets/gesturedescricaoproduto.dart';
 import 'package:catalogo_gagliauto/Model/url_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import 'package:carousel_pro/carousel_pro.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProdutoDetalhe extends StatefulWidget {
@@ -25,21 +22,30 @@ class ProdutoDetalhe extends StatefulWidget {
 class _ProdutoDetalheState extends State<ProdutoDetalhe> {
   TextEditingController _controllerQuantidade = TextEditingController();
   int quantidade = 1;
+  final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
 
   Future _getProdutoDetalhes() async {
-    http.Response response;
+    try {
+      http.Response response;
 
-    response = await http.get(getUrlDadosProduto(codigo: widget.codigo_pro));
+      response = await http.get(getUrlDadosProduto(codigo: widget.codigo_pro));
 
-    return json.decode(response.body);
+      return json.decode(response.body);
+    } on IntegerDivisionByZeroException catch (e) {
+      print(e);
+    }
   }
 
-  Future _getProdutosEquivalentes() async {
-    http.Response response;
+  Future _getFotosProduto() async {
+    try {
+      http.Response response;
 
-    response = await http.get(getUrlEquivalenciasProduto(codigo: widget.codigo_pro));
+      response = await http.get(getUrlFotosProduto(codigo: widget.codigo_pro));
 
-    return json.decode(response.body);
+      return json.decode(response.body);
+    } on IntegerDivisionByZeroException catch (e) {
+      print(e);
+    }
   }
 
   _addQuantidade() {
@@ -61,12 +67,24 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
     final SharedPreferences prefs = await _prefs;
     http.Response response;
 
-    response = await http.get(getUrlAddProdutoCarrinho(
-        cliente: prefs.getString("code_user"),
-        produto: produto,
-        quantidade: quantidade));
+    Map data = {
+      'codigo_car': prefs.getString("code_user"),
+      'produt_car': produto,
+      'quanti_car': quantidade
+    };
 
-    return json.decode(response.body);
+    var body = json.encode(data);
+
+    response = await http.post(getUrlAddProdutoCarrinho(), body: body);
+
+    if (response.statusCode == 201) {
+      _scaffoldkey.currentState.showSnackBar(SnackBar(
+        content: Text('Produto adicionado ao carrinho!'),
+      ));
+
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) => Carrinho()));
+    } else {}
   }
 
   _addFavorito() async {
@@ -75,10 +93,9 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
     http.Response response;
 
     response = await http.get(getUrlAddProdutoFavorito(
-        cliente: prefs.getString("code_user"),
-        produto: widget.codigo_pro));
+        cliente: prefs.getString("code_user"), produto: widget.codigo_pro));
 
-        return json.decode(response.body);
+    return json.decode(response.body);
   }
 
   @override
@@ -90,71 +107,73 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Produto"),
-          centerTitle: true,
-          actions: <Widget>[
-            widget.tp_favorito ?
-            IconButton(
-              icon: const Icon(
-                Icons.favorite,
-                size: 30,
-              ),
-              color: Colors.red,
-              tooltip: 'Adicionar aos Favoritos',
-              onPressed: _addFavorito,
-            ) :
-            IconButton(
-              icon: const Icon(
-                Icons.favorite_border,
-                size: 30,
-              ),
-              tooltip: 'Adicionar aos Favoritos',
-              onPressed: _addFavorito,
+      key: _scaffoldkey,
+      appBar: AppBar(
+        title: Text("Produto"),
+        centerTitle: true,
+        actions: <Widget>[
+          widget.tp_favorito
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.favorite,
+                    size: 30,
+                  ),
+                  color: Colors.red,
+                  tooltip: 'Adicionar aos Favoritos',
+                  onPressed: _addFavorito,
+                )
+              : IconButton(
+                  icon: const Icon(
+                    Icons.favorite_border,
+                    size: 30,
+                  ),
+                  tooltip: 'Adicionar aos Favoritos',
+                  onPressed: _addFavorito,
+                ),
+          IconButton(
+            icon: const Icon(
+              Icons.share,
+              size: 30,
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.share,
-                size: 30,
-              ),
-              tooltip: 'Compartilhar',
-              onPressed: () {},
-            )
-          ],
-        ),
-        body: Stack(
-          children: <Widget>[
-            FutureBuilder(
-              future: _getProdutoDetalhes(),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return Container(
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              height: 168,
-                              child: Image.asset("imagens/loading.GIF"),
-                            ),
-                            //Text("")
-                          ],
-                        ),
+            tooltip: 'Compartilhar',
+            onPressed: () {},
+          )
+        ],
+      ),
+      body: Stack(
+        children: <Widget>[
+          FutureBuilder(
+            future: _getProdutoDetalhes(),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return Container(
+                    child: Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            height: 168,
+                            child: Image.asset("imagens/loading.GIF"),
+                          ),
+                          //Text("")
+                        ],
                       ),
-                    );
-                    break;
-                  default:
-                    if (snapshot.hasError)
-                      return Container();
-                    else
-                      return _createGradeTable(context, snapshot);
-                }
-              },
-            ),
-          ],
-        ));
+                    ),
+                  );
+                  break;
+                default:
+                  if (snapshot.hasError)
+                    return Container();
+                  else
+                    return _createGradeTable(context, snapshot);
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _createGradeTable(BuildContext context, AsyncSnapshot snapshot) {
@@ -164,46 +183,40 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
       itemBuilder: (context, index) {
         return Column(
           children: <Widget>[
-            AspectRatio(
-              aspectRatio: 1,
-              child:
-              snapshot.data[0]["fotos"].toString() != "0" ?
-              Carousel(
-                images:
-                snapshot.data[0]["fotos"].map((url) {
-                  return FadeInImage(
-                      image: Image
-                          .memory(Base64Decoder().convert(url
-                          .toString()
-                          .replaceAll("\n", "").replaceAll("\r", "")
-                          .replaceAll("{foto: ", "")
-                          .replaceAll("}", "")))
-                          .image,
-                      placeholder: AssetImage('imagens/carrega_produtos.GIF'));
-                }).toList(),
-                dotSize: 4.0,
-                dotSpacing: 15.0,
-                dotBgColor: Colors.white,
-                dotColor: Colors.white,
-                autoplay: false,
-                borderRadius: true,
-              ) :
-              Carousel(
-                images: [
-                  FadeInImage(
-                      image: AssetImage('imagens/sem_imagem.jpg'),
-                      placeholder: AssetImage('imagens/carrega_produtos.GIF'))
-                ],
-                dotSize: 4.0,
-                dotSpacing: 15.0,
-                dotBgColor: Colors.white,
-                dotColor: Colors.white,
-                autoplay: false,
-                borderRadius: true,
-              )
-            ),
+            /*Container(
+              height: MediaQuery.of(context).size.width / 2,
+              child: FutureBuilder(
+                future: _getFotosProduto(),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Container(
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                height: 168,
+                                child: Image.asset("imagens/loading.GIF"),
+                              ),
+                              //Text("")
+                            ],
+                          ),
+                        ),
+                      );
+                      break;
+                    default:
+                      if (snapshot.hasError)
+                        return Container();
+                      else
+                        return _createSlideImagens(context, snapshot);
+                  }
+                },
+              ),
+            ),*/
             Text(
-              snapshot.data[0]["descri_pro"],
+              snapshot.data[0]["DESCRI_PRO"],
               style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
             ),
             SizedBox(
@@ -213,8 +226,10 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
               alignment: Alignment.centerLeft,
               child: Container(
                 child: Text(
-                  "(Ref.: " + snapshot.data[0]["rfabri_pro"].toString() +
-                      " Cód.: " + snapshot.data[0]["codigo_pro"].toString() +
+                  "(Ref.: " +
+                      snapshot.data[0]["RFABRI_PRO"].toString() +
+                      " Cód.: " +
+                      snapshot.data[0]["CODIGO_PRO"].toString() +
                       ")",
                   style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w500),
                   maxLines: 3,
@@ -229,15 +244,15 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
               decoration: BoxDecoration(
                   border: Border(
                       bottom: BorderSide(
-                        color: Colors.black12,
-                        width: 1.0,
-                      ))),
+                color: Colors.black12,
+                width: 1.0,
+              ))),
             ),
             SizedBox(
               height: 10.0,
             ),
             Text(
-              "R\$ ${snapshot.data[0]["pvenda_sld"].toStringAsFixed(2)}",
+              snapshot.data[0]["PVENDA_SLD"],
               style: TextStyle(
                   fontSize: 28.0,
                   fontWeight: FontWeight.bold,
@@ -312,9 +327,8 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
             Padding(
               padding: EdgeInsets.only(bottom: 50),
               child: InkWell(
-                onTap: (){
-                  _addCarrinho(
-                      snapshot.data[0]["codigo_pro"].toString(),
+                onTap: () {
+                  _addCarrinho(snapshot.data[0]["CODIGO_PRO"].toString(),
                       num.parse(_controllerQuantidade.text));
                 },
                 child: Hero(
@@ -325,14 +339,16 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
                         decoration: BoxDecoration(
                             color: Color.fromRGBO(38, 36, 99, 1.0),
                             borderRadius:
-                            BorderRadius.all(Radius.circular(30.0))),
+                                BorderRadius.all(Radius.circular(30.0))),
                         child: Row(
                           children: <Widget>[
                             Padding(
                                 padding: EdgeInsets.only(left: 25),
-                                child: Icon(Icons.shopping_cart, size: 35,
-                                  color: Colors.white,)
-                            ),
+                                child: Icon(
+                                  Icons.shopping_cart,
+                                  size: 35,
+                                  color: Colors.white,
+                                )),
                             Expanded(
                               child: Align(
                                 alignment: Alignment.center,
@@ -346,19 +362,41 @@ class _ProdutoDetalheState extends State<ProdutoDetalhe> {
                                 ),
                               ),
                             ),
-],
+                          ],
                         ) //_buildInside(context),
-                    )),
+                        )),
               ),
             ),
-            GestureDescricaoProduto(detalhes: snapshot
-                .data[0]["descri_apl"].toString().toString() == "null"
-                ? "Produto sem descrição... :("
-                : snapshot.data[0]["descri_apl"]),
-            GestureInformacoesTecnicas(snapshot: snapshot,),
+            GestureDescricaoProduto(
+                detalhes:
+                    snapshot.data[0]["DESCRI_APL"].toString().toString() ==
+                            "null"
+                        ? "Produto sem descrição... :("
+                        : snapshot.data[0]["DESCRI_APL"]),
+            GestureInformacoesTecnicas(
+              snapshot: snapshot,
+            ),
             ListviewEquivalencias(codigo_pro: widget.codigo_pro)
           ],
         );
+      },
+    );
+  }
+
+  Widget _createSlideImagens(BuildContext context, AsyncSnapshot snapshot) {
+    return ListView.builder(
+      padding: EdgeInsets.all(5),
+      scrollDirection: Axis.horizontal,
+      itemCount: snapshot.data.length,
+      itemBuilder: (context, index) {
+        return FadeInImage(
+            height: 50,
+            image: Image.memory(Base64Decoder().convert(snapshot.data[0]["FOTO"]
+                    .toString()
+                    .replaceAll("\n", "")
+                    .replaceAll("\r", "")))
+                .image,
+            placeholder: AssetImage('imagens/carrega_produtos.GIF'));
       },
     );
   }

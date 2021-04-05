@@ -19,7 +19,7 @@ Future _getCarrinho() async {
   http.Response response;
 
   response =
-  await http.get(getUrlCarrinho(codigo_cli: prefs.getString("code_user")));
+      await http.get(getUrlCarrinho(codigo_cli: prefs.getString("code_user")));
 
   return json.decode(response.body);
 }
@@ -29,8 +29,26 @@ Future _getTotalCarrinho() async {
   final SharedPreferences prefs = await _prefs;
   http.Response response;
 
-  response =
-  await http.get(getUrlTotalCarrinho(codigo_cli: prefs.getString("code_user")));
+  response = await http
+      .get(getUrlTotalCarrinho(codigo_cli: prefs.getString("code_user")));
+
+  return json.decode(response.body);
+}
+
+_removeDoCarrinho(String produto, num quantidade) async {
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final SharedPreferences prefs = await _prefs;
+  http.Response response;
+
+  Map data = {
+    'codigo_car': prefs.getString("code_user"),
+    'produt_car': produto,
+    'quanti_car': quantidade
+  };
+
+  var body = json.encode(data);
+
+  response = await http.post(getUrlAddProdutoCarrinho(), body: body);
 
   return json.decode(response.body);
 }
@@ -102,8 +120,7 @@ class _CarrinhoState extends State<Carrinho>
                         ),
                       )
                     ]),
-                child:
-                FutureBuilder(
+                child: FutureBuilder(
                   future: _getTotalCarrinho(),
                   // ignore: missing_return
                   builder: (context, snapshot) {
@@ -123,10 +140,9 @@ class _CarrinhoState extends State<Carrinho>
                                     Align(
                                       alignment: Alignment.topLeft,
                                       child: Container(
-                                        margin: EdgeInsets.only(top: 25),
-                                        padding:
-                                        const EdgeInsets.symmetric(
-                                            horizontal: 35.0),
+                                        margin: EdgeInsets.only(top: 15),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 25.0),
                                         child: Text(
                                           "Total do pedido",
                                           style: TextStyle(fontSize: 16),
@@ -134,25 +150,18 @@ class _CarrinhoState extends State<Carrinho>
                                       ),
                                     ),
                                     Expanded(
-                                      child: Text("  "),
-                                    ),
-                                    Align(
+                                        child: Align(
                                       alignment: Alignment.bottomRight,
                                       child: Container(
                                         margin: EdgeInsets.all(15),
-                                        padding:
-                                        const EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 10.0),
                                         child: Text(
-                                          "R\$ ${snapshot.data[0]["total"]
-                                              .toString()}",
-                                          style: TextStyle(fontSize: 28),
+                                          snapshot.data[0]["TOTAL"],
+                                          style: TextStyle(fontSize: 25),
                                         ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Text(""),
-                                    ),
+                                    )),
                                   ],
                                 ),
                               ),
@@ -160,12 +169,10 @@ class _CarrinhoState extends State<Carrinho>
                                 controller: _animationController,
                               )
                             ],
-                          )
-                    ;
-                  }
+                          );
+                    }
                   },
-                )
-            )
+                ))
           ],
         ));
   }
@@ -183,81 +190,79 @@ class _CarrinhoState extends State<Carrinho>
                 color: Colors.white,
                 child: Container(
                     child: Column(
+                  children: [
+                    ListTile(
+                      leading: FadeInImage(
+                          height: 120,
+                          width: 160,
+                          image: snapshot.data[index]["FOTOS"].toString() == "null" ? AssetImage('imagens/sem_imagem.jpg') : Image.memory(Base64Decoder()
+                              .convert(snapshot
+                              .data[index]["FOTOS"]
+                              .toString()
+                              .replaceAll("\n", "")
+                              .replaceAll("\r", "")
+                          ))
+                              .image,
+                          placeholder: AssetImage('imagens/carrega_produtos.GIF')),
+                      title: Text(
+                        snapshot.data[index]["DESCRI_PRO"],
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      //trailing: Text(snapshot.data[index]["quanti_car"].toString()),
+                      subtitle: Text("Cód.: " +
+                          snapshot.data[index]["CODIGO_PRO"].toString() +
+                          " Marca: " +
+                          snapshot.data[index]["DESCRI_MAR"].toString() +
+                          " Ref.: " +
+                          snapshot.data[index]["RFABRI_PRO"].toString()),
+                      onTap: () {},
+                    ),
+                    Row(
                       children: [
-                        ListTile(
-                          leading: FadeInImage(
-                              height: 120,
-                              width: 160,
-                              image: snapshot.data[index]["fotos"].toString() == "0" ? AssetImage('imagens/sem_imagem.jpg') : Image.memory(Base64Decoder()
-                                  .convert(snapshot
-                                  .data[index]["fotos"][0]
-                              ["foto"]
-                                  .toString()
-                                  .replaceAll("\n", "")
-                                  .replaceAll("\r", "")
-                              ))
-                                  .image,
-                              placeholder: AssetImage('imagens/carrega_produtos.GIF')),
-                          title: Text(
-                            snapshot.data[index]["descri_pro"],
-                            style: TextStyle(fontSize: 16),
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Text(
+                              snapshot.data[index]["QUANTI_CAR"].toString() +
+                                  " Unidades",
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
-                          //trailing: Text(snapshot.data[index]["quanti_car"].toString()),
-                          subtitle: Text("Cód.: " +
-                              snapshot.data[index]["codigo_pro"].toString() +
-                              " Marca: " +
-                              snapshot.data[index]["descri_mar"].toString() +
-                              " Ref.: " +
-                              snapshot.data[index]["rfabri_pro"].toString()),
-                          onTap: () {},
                         ),
-                        Row(
-                          children: [
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Container(
-                                padding:
+                        Expanded(
+                          child: Text(""),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            padding:
                                 const EdgeInsets.symmetric(horizontal: 10.0),
-                                child: Text(
-                                  snapshot.data[index]["quanti_car"]
-                                      .toString() +
-                                      " Unidades",
-                                  style: TextStyle(fontSize: 16),
-                                ),
+                            child: Text(
+                              snapshot.data[index]["TOTAL"],
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 25.0,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            Expanded(
-                              child: Text(""),
-                            ),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Container(
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
-                                child: Text(
-                                  "R\$ ${snapshot.data[index]["total"]
-                                      .toString()}",
-                                  style: TextStyle(
-                                    color: Theme
-                                        .of(context)
-                                        .primaryColor,
-                                    fontSize: 25.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
+                          ),
                         )
                       ],
-                    ))),
+                    )
+                  ],
+                ))),
             actions: <Widget>[],
             secondaryActions: <Widget>[
               IconSlideAction(
                   caption: 'Apagar',
                   color: Colors.red,
                   iconWidget: Icon(
-                    Icons.delete, size: 35, color: Colors.white,),
+                    Icons.delete,
+                    size: 35,
+                    color: Colors.white,
+                  ),
                   onTap: () {}),
             ],
           );

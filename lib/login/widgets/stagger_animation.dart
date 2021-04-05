@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
 
 class StaggerAnimation extends StatelessWidget {
   final AnimationController controller;
@@ -95,17 +96,24 @@ class StaggerAnimation extends StatelessWidget {
     final SharedPreferences prefs = await _prefs;
     FocusScope.of(context).requestFocus(new FocusNode());
 
-    var response = await http.get(
-        getUrlLogin(usuario: controllerUser.text, senha: controllerPass.text));
+    Map data = {
+      'cpf': controllerUser.text,
+      'senha': md5.convert(utf8.encode(controllerPass.text)).toString(),
+    };
+
+    var body = json.encode(data);
+    var url = getUrlLogin();
+
+    var response = await http.post(url, body: body);
 
     if (response.statusCode == 200) {
       var dados = json.decode(response.body);
       print(dados);
-      if (dados[0]["logado"].toString() == "1") {
+      if (dados[0]["LOGADO"].toString() == "1") {
         prefs.setBool("isconected", true);
-        prefs.setString("name_user", dados[0]["nome01_cli"].toString());
-        prefs.setString("code_user", dados[0]["codigo_cli"].toString());
-        prefs.setString("cpf_user", dados[0]["cpf001_cli"].toString());
+        prefs.setString("name_user", dados[0]["NOME01_CLI"].toString());
+        prefs.setString("code_user", dados[0]["CODIGO_CLI"].toString());
+        prefs.setString("cpf_user", dados[0]["CPF001_CLI"].toString());
         controller.forward();
       }
     } else {
